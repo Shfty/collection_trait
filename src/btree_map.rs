@@ -2,16 +2,16 @@ use std::collections::BTreeMap;
 
 use crate::Collection;
 
+type BTreeMapCollectionIterator<'a, K, V> =
+    std::iter::Map<std::collections::btree_map::Iter<'a, K, V>, fn((&'a K, &'a V)) -> (K, &'a V)>;
+
 impl<'a, K, V> Collection<'a, K> for BTreeMap<K, V>
 where
     K: 'a + Copy + Ord,
     V: 'a,
 {
     type Item = V;
-    type Iter = std::iter::Map<
-        std::collections::btree_map::Iter<'a, K, V>,
-        fn((&'a K, &'a V)) -> (K, &'a V),
-    >;
+    type Iter = BTreeMapCollectionIterator<'a, K, V>;
     type KeyIter = std::iter::Copied<std::collections::btree_map::Keys<'a, K, V>>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {

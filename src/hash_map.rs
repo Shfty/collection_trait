@@ -2,13 +2,16 @@ use std::{collections::HashMap, hash::Hash};
 
 use crate::Collection;
 
+type HashMapCollectionIterator<'a, K, V> =
+    std::iter::Map<std::collections::hash_map::Iter<'a, K, V>, fn((&'a K, &'a V)) -> (K, &'a V)>;
+
 impl<'a, K, V> Collection<'a, K> for HashMap<K, V>
 where
     K: 'a + Copy + Eq + Hash,
     V: 'a,
 {
     type Item = V;
-    type Iter = std::iter::Map<std::collections::hash_map::Iter<'a, K, V>, fn((&'a K, &'a V)) -> (K, &'a V)>;
+    type Iter = HashMapCollectionIterator<'a, K, V>;
     type KeyIter = std::iter::Copied<std::collections::hash_map::Keys<'a, K, V>>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {

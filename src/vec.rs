@@ -2,6 +2,8 @@ use std::{convert::{TryFrom, TryInto}, fmt::Debug, ops::Range};
 
 use crate::Collection;
 
+type VecCollectionIterator<'a, K, V> = std::iter::Map<std::iter::Enumerate<std::slice::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
+
 /// __Note:__ `Vec` collections have no mechanism for tracking keys, so a key is valid if it lies within 0..Vec::len().
 impl<'a, K, V> Collection<'a, K> for Vec<V>
 where
@@ -11,7 +13,7 @@ where
     V: 'a + Default,
 {
     type Item = V;
-    type Iter = std::iter::Map<std::iter::Enumerate<std::slice::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
+    type Iter = VecCollectionIterator<'a, K, V>;
     type KeyIter = std::iter::Map<Range<usize>, fn(usize) -> K>;
 
     fn get(&self, key: &K) -> Option<&Self::Item> {

@@ -1,6 +1,8 @@
-use std::{collections::{VecDeque, vec_deque}, convert::{TryFrom, TryInto}, fmt::Debug, ops::Range};
+use std::{collections::{VecDeque}, convert::{TryFrom, TryInto}, fmt::Debug, ops::Range};
 
 use crate::Collection;
+
+type VecDequeCollectionIterator<'a, K, V> = std::iter::Map<std::iter::Enumerate<std::collections::vec_deque::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
 
 /// __Note:__ `VecDeque` collections have no mechanism for tracking keys, so a key is valid if it lies within 0..Vec::len().
 impl<'a, K, V> Collection<'a, K> for VecDeque<V>
@@ -11,7 +13,7 @@ where
     V: 'a + Default,
 {
     type Item = V;
-    type Iter = std::iter::Map<std::iter::Enumerate<std::collections::vec_deque::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
+    type Iter = VecDequeCollectionIterator<'a, K, V>;
     type KeyIter = std::iter::Map<Range<usize>, fn(usize) -> K>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {

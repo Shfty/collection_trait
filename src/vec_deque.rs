@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, convert::{TryFrom, TryInto}, fmt::Debug, ops::Range};
+use std::{collections::{VecDeque, vec_deque}, convert::{TryFrom, TryInto}, fmt::Debug, ops::Range};
 
 use crate::Collection;
 
@@ -11,6 +11,7 @@ where
     V: 'a + Default,
 {
     type Item = V;
+    type Iter = std::iter::Map<std::iter::Enumerate<std::collections::vec_deque::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
     type KeyIter = std::iter::Map<Range<usize>, fn(usize) -> K>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {
@@ -37,6 +38,10 @@ where
 
     fn remove(&mut self, key: &K) -> Option<Self::Item> {
         VecDeque::remove(self, (*key).try_into().unwrap())
+    }
+
+    fn iter(&'a self) -> Self::Iter {
+        VecDeque::iter(self).enumerate().map(|(key, value)| (key.try_into().unwrap(), value))
     }
 
     fn keys(&'a self) -> Self::KeyIter {

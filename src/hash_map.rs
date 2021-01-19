@@ -8,6 +8,7 @@ where
     V: 'a,
 {
     type Item = V;
+    type Iter = std::iter::Map<std::collections::hash_map::Iter<'a, K, V>, fn((&'a K, &'a V)) -> (K, &'a V)>;
     type KeyIter = std::iter::Copied<std::collections::hash_map::Keys<'a, K, V>>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {
@@ -24,6 +25,10 @@ where
 
     fn remove(&mut self, key: &K) -> Option<Self::Item> {
         HashMap::remove(self, key)
+    }
+
+    fn iter(&'a self) -> Self::Iter {
+        HashMap::iter(self).map(|(key, value)| (*key, value))
     }
 
     fn keys(&'a self) -> Self::KeyIter {

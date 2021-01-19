@@ -14,6 +14,7 @@ where
     V: 'a,
 {
     type Item = V;
+    type Iter = std::iter::Map<std::iter::Enumerate<std::slice::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
     type KeyIter = std::iter::Map<Range<usize>, fn(usize) -> K>;
 
     fn get(&'a self, key: &K) -> Option<&'a Self::Item> {
@@ -30,6 +31,10 @@ where
 
     fn remove(&mut self, _key: &K) -> Option<Self::Item> {
         panic!("Can't remove from a slice collection")
+    }
+
+    fn iter(&'a self) -> Self::Iter {
+        <[_]>::iter(self).enumerate().map(|(key, value)| (key.try_into().unwrap(), value))
     }
 
     fn keys(&'a self) -> Self::KeyIter {

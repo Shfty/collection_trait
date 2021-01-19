@@ -17,6 +17,7 @@ pub use vec_deque::*;
 /// Trait abstraction over a key-value collection.
 pub trait Collection<'a, Key> {
     type Item: 'a;
+    type Iter: 'a + Iterator<Item = (Key, &'a Self::Item)>;
     type KeyIter: 'a + Iterator<Item = Key>;
 
     fn get(&'a self, key: &Key) -> Option<&Self::Item>;
@@ -25,6 +26,7 @@ pub trait Collection<'a, Key> {
     }
     fn insert(&mut self, key: Key, value: Self::Item) -> Option<Self::Item>;
     fn remove(&mut self, key: &Key) -> Option<Self::Item>;
+    fn iter(&'a self) -> Self::Iter;
     fn keys(&'a self) -> Self::KeyIter;
     fn contains_key(&'a self, key: &Key) -> bool;
 }

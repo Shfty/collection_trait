@@ -11,6 +11,7 @@ where
     V: 'a + Default,
 {
     type Item = V;
+    type Iter = std::iter::Map<std::iter::Enumerate<std::slice::Iter<'a, V>>, fn((usize, &V)) -> (K, &V)>;
     type KeyIter = std::iter::Map<Range<usize>, fn(usize) -> K>;
 
     fn get(&self, key: &K) -> Option<&Self::Item> {
@@ -41,6 +42,10 @@ where
         } else {
             None
         }
+    }
+
+    fn iter(&'a self) -> Self::Iter {
+        <[_]>::iter(self).enumerate().map(|(key, value)| (key.try_into().unwrap(), value))
     }
 
     fn keys(&'a self) -> Self::KeyIter {
